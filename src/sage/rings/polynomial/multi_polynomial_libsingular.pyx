@@ -982,11 +982,10 @@ cdef class MPolynomialRing_libsingular(MPolynomialRing_base):
                 else:
                     d[str(self.base_ring().gen())] = self.base_ring_gen()
             try:
-                if '/' in element:
-                    element = sage_eval(element,d)
-                else:
-                    element = element.replace("^","**")
-                    element = eval(element, d, {})
+                from sage.misc.parser import Parser, LookupNameMaker
+                R = self.base_ring()
+                p = Parser(Integer, R, LookupNameMaker(d, R))
+                return self(p.parse(element))
             except (SyntaxError, NameError):
                 raise TypeError("Could not find a mapping of the passed element to this ring.")
 
